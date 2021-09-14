@@ -1,21 +1,18 @@
-#include <stdlib.h>
-#include <stdio.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<getopt.h>
+#include<unistd.h>
+#include<string.h>
 #include "linklist1.h"
 
-typedef struct data_struct{
-
-        char messagetype;
-        char *messagestring;
-        struct data_struct *nextnodelink;
-}data_t;
 
  data_t *HEADPTR = NULL;              //to store the starting point of the linked list
  data_t *TEMPPTR = NULL;              //to temporarily keep the newly created structure before linking it to the linked list
  data_t *ITERATIONPTR = NULL;         //to to traverse the linked list in order to add the new structure to the end of the linked list
- static data_t *staticHEADPTR;
-
+ 
 
 //This function creates a linked list of structures and adds user provided messages to the the structure
+
 int appendmsg(char type, char *message){
 
     TEMPPTR = malloc(sizeof(data_t)); //always creates a new structure and allocate memory space for it. This structure is currently isolated until we link it below
@@ -47,4 +44,18 @@ int appendmsg(char type, char *message){
         return 0;
     }
 
+}
+
+void clearlog(){
+
+    printf("\nDeallocating memory...\n");
+    data_t *STEPPTR;
+    ITERATIONPTR = HEADPTR;
+    while (ITERATIONPTR != NULL){
+        STEPPTR = ITERATIONPTR;
+        ITERATIONPTR = ITERATIONPTR->nextnodelink;
+        free(STEPPTR);
+    }
+    printf("\nMemory deallocation completed\n\n");
+    
 }

@@ -1,128 +1,115 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-//#include "linklist1.h"
-
-int appendmsg(char type, char *message);
-
-typedef struct data_struct{
-
-        char messagetype;
-        char *messagestring;
-        struct data_struct *nextnodelink;
-}data_t;
-
- data_t *HEADPTR = NULL;              //to store the starting point of the linked list
- data_t *TEMPPTR = NULL;              //to temporarily keep the newly created structure before linking it to the linked list
- data_t *ITERATIONPTR = NULL;         //to to traverse the linked list in order to add the new structure to the end of the linked list
- static data_t *staticHEADPTR;
+#include<stdio.h>
+#include<stdlib.h>
+#include<getopt.h>
+#include<unistd.h>
+#include<string.h>
+#include "linklist1.h"
 
 int main(int argc, char *argv[]){
 
-    data_t *HEADPTR = NULL;              //to store the starting point of the linked list
- data_t *TEMPPTR = NULL;              //to temporarily keep the newly created structure before linking it to the linked list
- data_t *ITERATIONPTR = NULL;         //to to traverse the linked list in order to add the new structure to the end of the linked list
- static data_t *staticHEADPTR;
+    int option;
+    char messages[100];
+    char type; char flag = 'Y';
+    messages[100] = '\0';
 
-    char messages[50]; 
-    char type;
-    int i;
-    
-   /* printf("\nEnter Message String\n");
 
-    fgets(messages, sizeof(messages), stdin);
-
-    printf("\nEnter Message Type -> I/W/E/F\n");
-    
-    scanf("%c", &type);*/
-    
-    //addint(5, 3);
-
-    for (i = 0; 1<3; i++){
-
-        printf("\nEnter Message String\n");
-
-        fgets(messages, sizeof(messages), stdin);
-
-        printf("\nEnter Message Type -> I/W/E/F\n");
-    
-        scanf("%c", &type);
-        //appendmsg(type, messages); //passes message type and message string to the fucntion addmsg
-
-    TEMPPTR = malloc(sizeof(data_t)); //always creates a new structure and allocate memory space for it. This structure is currently isolated until we link it below
-    TEMPPTR->messagetype = type;
-    TEMPPTR->messagestring = messages;
-    TEMPPTR->nextnodelink = NULL;
-
-    if (HEADPTR == NULL){
-
-        HEADPTR = TEMPPTR;          //if there is nothing in the list yet, then store the TEMMPPTR structure as the first structure in the list (HEADPTR)
-
-        staticHEADPTR = HEADPTR;
-
-        printf("\nheadptr is %u\n", HEADPTR);
-
-        //return 0;
+    if (argc > 3){     //using argc to test if more than required arguments are passed
+        printf("\nInvalid number of arguments. Use -h for help.\n");
+        exit (1);
     }
 
-    else{                            //else block gets executed if there is already a structure in the linked list
+    if (argc == 1){     //that is if no filename is explicitly provided
+            printf("\nYou have provided no command line arguments. We shall send a message to the logger and name the log file \'messages.log\'\n");
+            //call addmsg and save file as Messages.log
+            while (1){              //giving the user a chance to enter the message before calling addmsg to create the structure
 
-        ITERATIONPTR = HEADPTR;     //keep a copy of the HEADPTR in ITERATIONPTR so we don't lose access to the beginning of the linked list. Then we can sefely iterate through the list with ITERATIONPTR
-        while (ITERATIONPTR->nextnodelink != NULL){     //this condition checks if we have reached the end of the linked list
-            
-            
-            ITERATIONPTR = ITERATIONPTR->nextnodelink;  //if the current structure is pointing to the next one, then copy the address of the next one to ITERATIONPTR
+            printf("\nEnter Message String\n");
 
+            fgets(messages, sizeof(messages), stdin);
+
+            printf("\nEnter Message Type -> I/W/E/F\n");
+    
+            scanf("%c%*c", &type);
+
+            if(type != 'I' & type != 'W' & type != 'E' & type != 'F'){  //checking if the message type is correct
+                printf("\nWrong Message Type. Terminating Logger Program\n");
+                clearlog();
+                exit(1);
+            }
+
+            appendmsg(type, messages); //passes message type and message string to the fucntion addmsg
+
+            printf("\nWould you like to add more message? -> Y/N\n");
+            scanf("%c%*c", &flag);
+            if (flag == 'Y')
+                continue;
+            else
+                break;
+        }    
+
+        clearlog(); //deallocating linked list allocated memory
+        return 0;
+    }
+            //this block uses getopt function to collect the command line argument
+         while ((option = getopt(argc, argv, ":ht:")) != -1){   //starting the options with a ':' turns off getopt's error so we can just print our own perror messages
+            switch (option){
+
+                    case 'h':
+                        printf("\nYou chose h\n");
+                        printf("\nHelp: driver -h: displays help\n\ndriver -t sec: randomly prints log\n\ndriver <logfilename>: saves the log with the given filename\n\n");
+                        exit(2);
+
+                    case 't':
+                        printf("\nYou chose t and its parameter is %d\n", atoi(optarg)); //use %s to output optarg because it is a pointer and %s will print it all
+                        printf("\nLog Messages are printed here at random interval\n");
+                        exit(5); //exit for now till getlog() is ready
+                        break; 
+                        //call getlog and print out the log message and exit
+
+                    default:
+                        perror("\n\nYou have entered an invalid argument/parameter. See Usage below"); //use of perror
+                        printf("\ndriver -h: displays help\n\ndriver -t sec: randomly prints log\n\ndriver <logfilename>: saves the log with the given filename\\nn");  
+                        exit(3);
+            }
+            
         }
 
-        ITERATIONPTR->nextnodelink = TEMPPTR;   //inserts the address of the newly created node, i.e. the last structure into the nextnodelink of the penultimate one so they are linked together
-        
-        //return 0;
-    }
+        //if none of the above if conditions is true, then it implies the argument is a filename.
+       printf("\nYou have provided filename as %s.log\n", argv[optind]); //optind is part of getopt variables. It is index of the next character not preceded by an '-' so we can use it to print the filename
+       
+       //start collecting type and message to call addmsg() and make filename as user provided.
+       while (1){
 
-}
+            printf("\nEnter Message String\n");
+
+            fgets(messages, sizeof(messages), stdin);
+
+            printf("\nEnter Message Type -> I/W/E/F\n");
+    
+            scanf("%c%*c", &type);
+
+            if(type != 'I' & type != 'W' & type != 'E' & type != 'F'){
+                printf("\nWrong Message Type. Terminating Logger Program\n");
+                clearlog();
+                exit(1);
+            }
+
+            appendmsg(type, messages); //passes message type and message string to the fucntion addmsg
+
+            printf("\nWould you like to add more message? -> Y/N\n");
+            scanf("%c%*c", &flag);
+            if (flag == 'Y')
+                continue;
+            else
+                break;
+        }    
+
+//end of messages, proceed to call getlog() and savelog() functions
            
 
-   // printf("\nMessage String from HEADPTR is %s\n", staticHEADPTR->messagestring);
+clearlog(); //frees the memory allocated by malloc
 
-   // printf("\nMessage Type from HEADPTR is %c\n", staticHEADPTR->messagetype);
-
-    return 0;
+return 0;
 
 }
 
-/*This function creates a linked list of structures and adds user provided messages to the the structure
-int appendmsg(char type, char *message){
-
-    TEMPPTR = malloc(sizeof(data_t)); //always creates a new structure and allocate memory space for it. This structure is currently isolated until we link it below
-    TEMPPTR->messagetype = type;
-    TEMPPTR->messagestring = message;
-    TEMPPTR->nextnodelink = NULL;
-
-    if (HEADPTR == NULL){
-
-        HEADPTR = TEMPPTR;          //if there is nothing in the list yet, then store the TEMMPPTR structure as the first structure in the list (HEADPTR)
-
-        staticHEADPTR = HEADPTR;
-
-        printf("\nheadptr is %u\n", HEADPTR);
-
-        return 0;
-    }
-
-    else{                            //else block gets executed if there is already a structure in the linked list
-
-        ITERATIONPTR = HEADPTR;     //keep a copy of the HEADPTR in ITERATIONPTR so we don't lose access to the beginning of the linked list. Then we can sefely iterate through the list with ITERATIONPTR
-        while (ITERATIONPTR->nextnodelink != NULL){     //this condition checks if we have reached the end of the linked list
-            
-
-            ITERATIONPTR = ITERATIONPTR->nextnodelink;  //if the current structure is pointing to the next one, then copy the address of the next one to ITERATIONPTR
-
-        }
-
-        ITERATIONPTR->nextnodelink = TEMPPTR;   //inserts the address of the newly created node, i.e. the last structure into the nextnodelink of the penultimate one so they are linked together
-        
-        return 0;
-    }
-
-}*/

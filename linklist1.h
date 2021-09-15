@@ -4,19 +4,21 @@
 #include<getopt.h>
 #include<unistd.h>
 #include<string.h>
+#include<time.h>
 
 typedef struct data_struct{
-
+        
+        //time_t messagetime;
         char messagetype;
         char *messagestring;
         struct data_struct *nextnodelink;
 }data_t;
 
-int appendmsg(char type, char *message);
+int addmsg(char type, char *message);
 
 void clearlog();
 
-static data_t *staticHEADPTR;
+int savelog(char *filename);
 
 
 

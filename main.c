@@ -3,12 +3,13 @@
 #include<getopt.h>
 #include<unistd.h>
 #include<string.h>
+#include<time.h>
 #include "linklist1.h"
 
 int main(int argc, char *argv[]){
 
     int option;
-    char messages[100];
+    char messages[100]; char *filename;
     char type; char flag = 'Y';
     messages[100] = '\0';
 
@@ -20,6 +21,7 @@ int main(int argc, char *argv[]){
 
     if (argc == 1){     //that is if no filename is explicitly provided
             printf("\nYou have provided no command line arguments. We shall send a message to the logger and name the log file \'messages.log\'\n");
+            filename = "Messages.log";
             //call addmsg and save file as Messages.log
             while (1){              //giving the user a chance to enter the message before calling addmsg to create the structure
 
@@ -37,7 +39,7 @@ int main(int argc, char *argv[]){
                 exit(1);
             }
 
-            appendmsg(type, messages); //passes message type and message string to the fucntion addmsg
+            addmsg(type, messages); //passes message type and message string to the fucntion addmsg
 
             printf("\nWould you like to add more message? -> Y/N\n");
             scanf("%c%*c", &flag);
@@ -45,8 +47,9 @@ int main(int argc, char *argv[]){
                 continue;
             else
                 break;
-        }    
+        }   
 
+        savelog(filename);
         clearlog(); //deallocating linked list allocated memory
         return 0;
     }
@@ -76,7 +79,7 @@ int main(int argc, char *argv[]){
 
         //if none of the above if conditions is true, then it implies the argument is a filename.
        printf("\nYou have provided filename as %s.log\n", argv[optind]); //optind is part of getopt variables. It is index of the next character not preceded by an '-' so we can use it to print the filename
-       
+       filename = argv[optind];
        //start collecting type and message to call addmsg() and make filename as user provided.
        while (1){
 
@@ -94,7 +97,7 @@ int main(int argc, char *argv[]){
                 exit(1);
             }
 
-            appendmsg(type, messages); //passes message type and message string to the fucntion addmsg
+            addmsg(type, messages); //passes message type and message string to the fucntion addmsg
 
             printf("\nWould you like to add more message? -> Y/N\n");
             scanf("%c%*c", &flag);
@@ -105,7 +108,7 @@ int main(int argc, char *argv[]){
         }    
 
 //end of messages, proceed to call getlog() and savelog() functions
-           
+savelog(filename);
 
 clearlog(); //frees the memory allocated by malloc
 

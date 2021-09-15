@@ -3,29 +3,42 @@
 #include<getopt.h>
 #include<unistd.h>
 #include<string.h>
+#include<time.h>
 #include "linklist1.h"
 
-
+//extern data_t *staticHEADPTR = NULL;
  data_t *HEADPTR = NULL;              //to store the starting point of the linked list
  data_t *TEMPPTR = NULL;              //to temporarily keep the newly created structure before linking it to the linked list
  data_t *ITERATIONPTR = NULL;         //to to traverse the linked list in order to add the new structure to the end of the linked list
- 
+ time_t mtime;
+ char savelogstring[200] = "\0";        //log string can only be 200 characters long
 
 //This function creates a linked list of structures and adds user provided messages to the the structure
 
-int appendmsg(char type, char *message){
+int addmsg(char type, char *message){
 
+    char *logtime;
     TEMPPTR = malloc(sizeof(data_t)); //always creates a new structure and allocate memory space for it. This structure is currently isolated until we link it below
     TEMPPTR->messagetype = type;
     TEMPPTR->messagestring = message;
+    time(&mtime);
+    logtime = ctime(&mtime);
+
+     strcat(savelogstring, message); //concatenates the message, message type and time and we can pass 'savelogstring' to savelog() to write to file
+     strcat(savelogstring, &type);
+     strcat(savelogstring, "  ");
+     strcat(savelogstring, logtime);
+     strcat(savelogstring, "\n");
 
     if (HEADPTR == NULL){
 
         HEADPTR = TEMPPTR;          //if there is nothing in the list yet, then store the TEMMPPTR structure as the first structure in the list (HEADPTR)
 
-        staticHEADPTR = HEADPTR;
+        //staticHEADPTR = TEMPPTR;
 
         printf("\nheadptr is %u\n", HEADPTR);
+        //printf("\nstatic headptr is %u\n", staticHEADPTR);
+        //printf("\nlinked list contains %s %c\n", HEADPTR->messagestring, HEADPTR->messagetype);
 
         return 0;
     }
@@ -40,9 +53,11 @@ int appendmsg(char type, char *message){
         }
 
         ITERATIONPTR->nextnodelink = TEMPPTR;   //inserts the address of the newly created node, i.e. the last structure into the nextnodelink of the penultimate one so they are linked together
-        
+        //printf("\nlinked list contains %s %c\n", ITERATIONPTR->messagestring, ITERATIONPTR->messagetype);
+
         return 0;
     }
+    
 
 }
 
@@ -58,4 +73,18 @@ void clearlog(){
     }
     printf("\nMemory deallocation completed\n\n");
     
+}
+
+int savelog(char *filename){
+
+    FILE *logfile;
+
+    logfile = fopen(filename, "a"); //opens logfile in append mode
+    if (logfile == NULL){
+        perror("\nFile cannot be opened\n");
+        exit(1);
+    }
+
+    fputs(savelogstring, logfile);    
+    return 0;
 }

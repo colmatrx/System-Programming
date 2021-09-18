@@ -4,14 +4,17 @@
 #include<unistd.h>
 #include<string.h>
 #include<time.h>
+#include<strings.h>
 #include "linklist1.h"
 
-//extern data_t *staticHEADPTR = NULL;
+/*Author - Idris Adeleke; Submission Date: 09/18/2021*/
+
+
  data_t *HEADPTR = NULL;              //to store the starting point of the linked list
  data_t *TEMPPTR = NULL;              //to temporarily keep the newly created structure before linking it to the linked list
  data_t *ITERATIONPTR = NULL;         //to to traverse the linked list in order to add the new structure to the end of the linked list
  time_t mtime;
- char savelogstring[200] = "\0";        //log string can only be 200 characters long
+ char savelogstring[1000] = "\0";        //log string can only be 1000 characters long
 
 //This function creates a linked list of structures and adds user provided messages to the the structure
 
@@ -34,12 +37,6 @@ int addmsg(char type, char *message){
 
         HEADPTR = TEMPPTR;          //if there is nothing in the list yet, then store the TEMMPPTR structure as the first structure in the list (HEADPTR)
 
-        //staticHEADPTR = TEMPPTR;
-
-        printf("\nheadptr is %u\n", HEADPTR);
-        //printf("\nstatic headptr is %u\n", staticHEADPTR);
-        //printf("\nlinked list contains %s %c\n", HEADPTR->messagestring, HEADPTR->messagetype);
-
         return 0;
     }
 
@@ -53,8 +50,7 @@ int addmsg(char type, char *message){
         }
 
         ITERATIONPTR->nextnodelink = TEMPPTR;   //inserts the address of the newly created node, i.e. the last structure into the nextnodelink of the penultimate one so they are linked together
-        //printf("\nlinked list contains %s %c\n", ITERATIONPTR->messagestring, ITERATIONPTR->messagetype);
-
+        
         return 0;
     }
     
@@ -75,9 +71,18 @@ void clearlog(){
     
 }
 
+
+char *getlog(){
+
+    return savelogstring;
+}
+
+
 int savelog(char *filename){
 
-    FILE *logfile;
+    FILE *logfile; char *savelog;
+
+    savelog = getlog();         //calls getlog to collect the memory address of the string to be saved
 
     logfile = fopen(filename, "a"); //opens logfile in append mode
     if (logfile == NULL){
@@ -85,6 +90,7 @@ int savelog(char *filename){
         exit(1);
     }
 
-    fputs(savelogstring, logfile);    
+    fputs(savelog, logfile);    //writes log message to file
+    fclose(logfile);
     return 0;
 }

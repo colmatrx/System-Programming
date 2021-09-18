@@ -16,9 +16,11 @@ typedef struct data_struct{
 
 int addmsg(char type, char *message);
 
-void clearlog();
+char *getlog();
 
 int savelog(char *filename);
+
+void clearlog();
 
 
 

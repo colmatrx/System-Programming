@@ -1,0 +1,32 @@
+############## README FILE ##############
+
+This program reads log messages from the user via standard input. The maximum number of characters in the log is 1000.
+
+The user is allowed to provide a line of message terminated by the enter key.
+
+The user is next asked to provide the type of message.
+
+If the user invokes the program without any argument, the logfile is saved to disk as "Messages.log"
+
+If user invokes the program with a filename, the filename is used as the logfile name on disk.
+
+Command line agruments accepted by the program are -h and -t [sec]
+
+If user calls the program with a -h, it displays the help
+
+If user calls the program with a -t sec, the message in default "Messages.log" are displayed in random time between 0 and 2*t sec
+
+During log display, terminate program with Ctrl+C
+
+############# How to run this program ###############
+
+Type './driver' to invoke the program with the appropriate arguments.
+
+How to recompile this program: Type 'make clean' to recompile.
+
+########### Issues Encountered ##############
+
+Even though I used a linked list to log the messages, I could not retrieve the message string from the linked correctly from each node.
+
+Therefore I improvised by storing the structure as a concatenated string in a separate variable and using that variable pointer to save to disk.
+
